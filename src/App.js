@@ -2,15 +2,20 @@ import {useCallback, useEffect, useState} from "react";
 import "./App.css";
 
 import {
+  find,
+  forEach,
   get, 
-  has,
   keys,
   map,
+  maxBy,
   merge,
+  slice,
   toLower
 } from "lodash";
 
 import {
+  MAX_CHARACTER_LEVEL, 
+  MIN_CHARACTER_LEVEL,
   BaseCharacterClassNames as CharacterClassNames, 
   BaseCharacterNames as CharacterNames,
   CharacterGreenSkillTrees
@@ -19,22 +24,29 @@ import {
 function App() {
   const initialKey = "OPERATIVE";
   const [selectedClassKey, setSelectedClassKey] = useState(initialKey);
-  const [selectedCharacter, setSelectedCharacter] = useState(generateCharacter(CharacterClassNames[selectedClassKey], selectedClassKey));
-  const [localChanges, setLocalChanges] = useState({
-    OPERATIVE: {},
-    SIREN: {},
-    BEASTMASTER: {},
-    GUNNER: {}
-  });
+  const [availableCharacters, setAvailableCharacters] = useState(generateAllCharacters());
 
-  console.warn(selectedClassKey);
+  function generateAllCharacters() {
+    let returnState = {};
+    forEach(keys(CharacterClassNames), (classKey) => {
+      returnState = merge({}, returnState, {[classKey]: generateCharacter(CharacterNames[classKey], CharacterClassNames[classKey])});
+    });
 
+    return returnState;
+  }
+
+  /**
+   * 
+   * @param {*} nameString 
+   * @param {*} classString 
+   */
   function generateCharacter(nameString, classString) {
     const base = {
       name: nameString,
       className: classString,
       level: 1,
-      skillPointsAvailable: 0
+      skillPointsSpent: 0,
+      greenTreeSkills: []
     }
   
     let extendedAttributes = {
@@ -71,6 +83,29 @@ function App() {
     return merge({}, base, extendedAttributes);
   }
 
+  function levelCharacterUp(forceLevel = false) {
+    setAvailableCharacters(prevState => (
+        merge({}, availableCharacters, {
+          [selectedClassKey]: {
+            level: forceLevel ? forceLevel : prevState[selectedClassKey].level + 1 <= MAX_CHARACTER_LEVEL ? prevState[selectedClassKey].level + 1 : MAX_CHARACTER_LEVEL
+          }
+        })
+      )
+    );
+  }
+
+  function levelCharacterDown(forceLevel = false) {
+    setAvailableCharacters(prevState => (
+        merge({}, availableCharacters, {
+          [selectedClassKey]: {
+            level: forceLevel ? forceLevel : prevState[selectedClassKey].level > 1 ? prevState[selectedClassKey].level - 1 : MIN_CHARACTER_LEVEL,
+            skillPointsSpent: prevState[selectedClassKey].skillPointsSpent > 1 ? prevState[selectedClassKey].skillPointsSpent - 1 : 0
+          }
+        })
+      )
+    );
+  }
+
   const selectCharacterArray = map(keys(CharacterClassNames), (key) => {
     let onClick = null;
     if (selectedClassKey !== key) {
@@ -92,49 +127,48 @@ function App() {
     return arrayItem;
   });
 
-  const generateCharacterCallback = useCallback((characterClass, characterClassKey) => {
-    return generateCharacter(CharacterNames[characterClassKey], characterClass);
-  }, []);
+  const selectedCharacter = get(availableCharacters, selectedClassKey);
+  console.log(selectedCharacter);
+  
+  let characterPanel = null;
+  let skillPanel = null;
+  if (selectedCharacter) {
+    let availableSkillPoints = selectedCharacter.level - 2 - selectedCharacter.skillPointsSpent;
+    if (availableSkillPoints < 0) {
+      availableSkillPoints = 0;
+    }
 
-  useEffect(() => {
-    setSelectedCharacter(generateCharacterCallback(CharacterClassNames[selectedClassKey], selectedClassKey));
-  }, [
-    generateCharacterCallback, 
-    selectedClassKey
-  ]);
+    characterPanel = (
+      <div>
+        <h3>{selectedCharacter.formattedName}</h3>
+        <p>Name: {selectedCharacter.name}</p>
+        <p>Class: {selectedCharacter.className}</p>
+        <p>Level: {selectedCharacter.level}</p>
+        <button
+          onClick={() => levelCharacterUp(MAX_CHARACTER_LEVEL)}
+        >Max</button>
+        <button
+          onClick={() => levelCharacterUp()}
+        >+</button>
+        <button
+          onClick={() => levelCharacterDown()}
+        >-</button>
+        <button
+          onClick={() => levelCharacterDown(MIN_CHARACTER_LEVEL)}
+        >Min</button>
+        <p>Available Skill Points: {availableSkillPoints}</p>
+      </div>
+    );
 
-  const selectedLocalChanges = localChanges[selectedClassKey];
-  const characterPanel = selectedCharacter !== null ? (
-    <div>
-      <h3>{selectedCharacter.formattedName}</h3>
-      <p>Name: {selectedCharacter.name}</p>
-      <p>Class: {selectedCharacter.className}</p>
-      <p>Level: {selectedLocalChanges.level ? selectedLocalChanges.level : selectedCharacter.level}</p>
-      <button
-        onClick={() => setLocalChanges(prevState => (
-          merge({}, localChanges, {
-            [selectedClassKey]: {
-              level: prevState[selectedClassKey].level ? prevState[selectedClassKey].level + 1 : 2
-            }
-          })
-        )
-          
-        )}
-      >+</button>
-      <button
-        onClick={() => setLocalChanges(prevState => (
-          merge({}, localChanges, {
-            [selectedClassKey]: {
-              level: prevState[selectedClassKey].level && prevState[selectedClassKey].level > 1 ? prevState[selectedClassKey].level - 1 : 1
-            }
-          })
-        )
-          
-        )}
-      >-</button>
-      <p>Available Skill Points: {selectedCharacter.skillPointsAvailable}</p>
-    </div>
-  ) : null;
+    const basicSkill = find(CharacterGreenSkillTrees[selectedClassKey], {id: 1});
+    console.warn(basicSkill);
+
+    const restOfGreenTree = slice(CharacterGreenSkillTrees[selectedClassKey], 1);
+    console.log(restOfGreenTree);
+
+    const rowCount = get(maxBy(restOfGreenTree, "row"), "row");
+    console.warn("rows", rowCount);
+  }
 
   return (
     <div className="App">

@@ -1,3 +1,6 @@
+export const MAX_CHARACTER_LEVEL = 65;
+export const MIN_CHARACTER_LEVEL = 1;
+
 export const BaseCharacterClassNames = Object.freeze({
   OPERATIVE: "Operative",
   SIREN: "Siren",
@@ -15,6 +18,7 @@ export const BaseCharacterNames = Object.freeze({
 export const CharacterGreenSkillTrees = Object.freeze({
   OPERATIVE: [
     {
+      id: 1,
       name: "Barrier",
       row: 0,
       ranksAvailable: 0,
@@ -23,6 +27,7 @@ export const CharacterGreenSkillTrees = Object.freeze({
       assetReference: "DeployBarrier"
     },
     {
+      id: 2,
       name: "Adrenaline",
       row: 1,
       ranksAvailable: 5,
@@ -31,6 +36,7 @@ export const CharacterGreenSkillTrees = Object.freeze({
       assetReference: "ExtraParts"
     },
     {
+      id: 3,
       name: "Hearty Stock",
       row: 1,
       ranksAvailable: 3,
@@ -39,6 +45,7 @@ export const CharacterGreenSkillTrees = Object.freeze({
       assetReference: "HeartyStock"
     },
     {
+      id: 4,
       name: "Ready For Action",
       row: 1,
       ranksAvailable: 5,
