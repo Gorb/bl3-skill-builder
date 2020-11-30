@@ -21,6 +21,8 @@ import {
   CharacterGreenSkillTrees
 } from "./string-constants/characters";
 
+import CharacterPanel from "./components/character-panel";
+
 function App() {
   const initialKey = "OPERATIVE";
   const [selectedClassKey, setSelectedClassKey] = useState(initialKey);
@@ -116,7 +118,7 @@ function App() {
 
     const arrayItem = (
       <button
-        className="Character-select"
+        className="character-select"
         key={`${toLower(CharacterNames[key])}`}
         onClick={onClick}
       >
@@ -133,31 +135,13 @@ function App() {
   let characterPanel = null;
   let skillPanel = null;
   if (selectedCharacter) {
-    let availableSkillPoints = selectedCharacter.level - 2 - selectedCharacter.skillPointsSpent;
-    if (availableSkillPoints < 0) {
-      availableSkillPoints = 0;
-    }
 
     characterPanel = (
-      <div>
-        <h3>{selectedCharacter.formattedName}</h3>
-        <p>Name: {selectedCharacter.name}</p>
-        <p>Class: {selectedCharacter.className}</p>
-        <p>Level: {selectedCharacter.level}</p>
-        <button
-          onClick={() => levelCharacterUp(MAX_CHARACTER_LEVEL)}
-        >Max</button>
-        <button
-          onClick={() => levelCharacterUp()}
-        >+</button>
-        <button
-          onClick={() => levelCharacterDown()}
-        >-</button>
-        <button
-          onClick={() => levelCharacterDown(MIN_CHARACTER_LEVEL)}
-        >Min</button>
-        <p>Available Skill Points: {availableSkillPoints}</p>
-      </div>
+      <CharacterPanel 
+        levelCharacterUp={levelCharacterUp}
+        levelCharacterDown={levelCharacterDown}
+        selectedCharacter={selectedCharacter}
+      />
     );
 
     const basicSkill = find(CharacterGreenSkillTrees[selectedClassKey], {id: 1});
@@ -171,7 +155,7 @@ function App() {
   }
 
   return (
-    <div className="App">
+    <div className="app">
       <div>
         {selectCharacterArray}
         {characterPanel}
