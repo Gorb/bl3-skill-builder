@@ -86,25 +86,46 @@ function App() {
   }
 
   function levelCharacterUp(forceLevel = false) {
-    setAvailableCharacters(prevState => (
-        merge({}, availableCharacters, {
+    setAvailableCharacters(prevState => {
+        let newCharacterLevel = MAX_CHARACTER_LEVEL;
+        if (forceLevel) {
+          newCharacterLevel = forceLevel;
+        }
+        else if (prevState[selectedClassKey].level + 1 <= MAX_CHARACTER_LEVEL) {
+          newCharacterLevel = prevState[selectedClassKey].level + 1;
+        }
+
+        return merge({}, availableCharacters, {
           [selectedClassKey]: {
-            level: forceLevel ? forceLevel : prevState[selectedClassKey].level + 1 <= MAX_CHARACTER_LEVEL ? prevState[selectedClassKey].level + 1 : MAX_CHARACTER_LEVEL
+            level: newCharacterLevel
           }
-        })
-      )
+        });
+      }
     );
   }
 
   function levelCharacterDown(forceLevel = false) {
-    setAvailableCharacters(prevState => (
-        merge({}, availableCharacters, {
+    setAvailableCharacters(prevState => {
+        let newCharacterLevel = MIN_CHARACTER_LEVEL;
+        if (forceLevel) {
+          newCharacterLevel = forceLevel;
+        }
+        else if (prevState[selectedClassKey].level > 1) {
+          newCharacterLevel = prevState[selectedClassKey].level - 1
+        }
+
+        let newSkillPointsSpent = 0;
+        if (prevState[selectedClassKey].skillPointsSpent > 1) {
+          newSkillPointsSpent = prevState[selectedClassKey].skillPointsSpent - 1;
+        }
+      
+        return merge({}, availableCharacters, {
           [selectedClassKey]: {
-            level: forceLevel ? forceLevel : prevState[selectedClassKey].level > 1 ? prevState[selectedClassKey].level - 1 : MIN_CHARACTER_LEVEL,
-            skillPointsSpent: prevState[selectedClassKey].skillPointsSpent > 1 ? prevState[selectedClassKey].skillPointsSpent - 1 : 0
+            level: newCharacterLevel,
+            skillPointsSpent: newSkillPointsSpent
           }
-        })
-      )
+        });
+      }
     );
   }
 
