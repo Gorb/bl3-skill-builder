@@ -19,9 +19,10 @@ import {
   BaseCharacterClassNames as CharacterClassNames, 
   BaseCharacterNames as CharacterNames,
   CharacterGreenSkillTrees
-} from "./string-constants/characters";
+} from "./data/characters";
 
 import CharacterPanel from "./components/character-panel";
+import SkillTreePanel from "./components/skill-tree-panel";
 
 function App() {
   const initialKey = "OPERATIVE";
@@ -154,9 +155,8 @@ function App() {
   console.log(selectedCharacter);
   
   let characterPanel = null;
-  let skillPanel = null;
+  let skillTreePanel = null;
   if (selectedCharacter) {
-
     characterPanel = (
       <CharacterPanel 
         levelCharacterUp={levelCharacterUp}
@@ -173,6 +173,10 @@ function App() {
 
     const rowCount = get(maxBy(restOfGreenTree, "row"), "row");
     console.warn("rows", rowCount);
+
+    skillTreePanel = (
+      <SkillTreePanel />
+    );
   }
 
   return (
@@ -180,6 +184,7 @@ function App() {
       <div>
         {selectCharacterArray}
         {characterPanel}
+        {skillTreePanel}
       </div>
     </div>
   );

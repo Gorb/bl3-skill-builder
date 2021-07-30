@@ -1,4 +1,4 @@
-export const MAX_CHARACTER_LEVEL = 65;
+export const MAX_CHARACTER_LEVEL = 72;
 export const MIN_CHARACTER_LEVEL = 1;
 
 export const BaseCharacterClassNames = Object.freeze({

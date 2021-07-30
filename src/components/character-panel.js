@@ -1,9 +1,9 @@
-import PropTypes from 'prop-types';
+import PropTypes from "prop-types";
 
 import {
   MAX_CHARACTER_LEVEL, 
   MIN_CHARACTER_LEVEL
-} from "../string-constants/characters";
+} from "../data/characters";
 
 export default function CharacterPanel(props) {
   const {
